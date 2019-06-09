@@ -52,7 +52,8 @@ public partial class Form1 : Form
             private void NotifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             Clipboard.SetText(getDay().ToString());
-            MessageBox.Show($"Today is the {getDay().ToString()}{getPrefix()} day of the year. Copied to the clipboard.");
+            MessageBox.Show($"Today is the {getDay().ToString()}{getPrefix()} day of the year. Copied to the clipboard.",
+                "CurrentDay");
         }
 
         void Exit(object sender, EventArgs e)

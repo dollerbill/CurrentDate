@@ -54,8 +54,9 @@ namespace dateApp
             this.Name = "CurrentDay";
             this.Text = "CurrentDay";
             this.ResumeLayout(false);
+            this.FormBorderStyle = FormBorderStyle.SizableToolWindow;
             this.ShowInTaskbar = false;
-            WindowState = FormWindowState.Minimized;
+            this.WindowState = FormWindowState.Minimized;
             this.Hide();
         }
 
