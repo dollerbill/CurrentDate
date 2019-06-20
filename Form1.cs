@@ -8,6 +8,7 @@ using Microsoft.VisualBasic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace dateApp
 {
@@ -50,45 +51,116 @@ public partial class Form1 : Form
             }
         }
 
-            private void NotifyIcon1_MouseClick(object sender, MouseEventArgs e)
+        private void NotifyIcon1_MouseClick(object sender, MouseEventArgs e)
         {
-            Clipboard.SetText(getDay().ToString());
-            MessageBox.Show($"Today is the {getDay().ToString()}{getPrefix()} day of the year. Copied to the clipboard.",
-                "CurrentDay");
+            if (e.Button == MouseButtons.Left)
+            {
+                Clipboard.SetText(getDay().ToString());
+                MessageBox.Show($"Today is the {getDay().ToString()}{getPrefix()} day of the year. Copied to the clipboard.",
+                    "CurrentDay");
+            }
         }
 
-        private void NotifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        //private void Custom(object sender, EventArgs e)
+        //{
+        //    string custom = Interaction.InputBox("Enter a custom Date", "Custom Date", "MM-DD");
+        //    string customText;
+        //    int customDays;
+        //    string[] customNew = custom.Select(c => c.ToString()).ToArray();
+        //    string customMonth;
+        //    string customDay;
+        //    if (Regex.IsMatch(custom, @"[a-zA-Z]"))
+        //    {
+        //        MessageBox.Show("Invalid date entry", "Error");
+        //        return;
+        //    }
+        //    if (custom.Length > 1)
+        //    {
+        //        if (customNew[1] == "-" && custom.Length == 4)
+        //        {/* single digit month */ } else if (customNew[2] == "-" && custom.Length == 4)
+        //        {/* single digit day */ }
+        //        customMonth = custom.Substring(0, 2);
+        //        customDay = custom.Substring(3, 2);
+        //        DateTimeOffset customDate = new DateTimeOffset(DateTime.Now.Year, Convert.ToInt32(customMonth), Convert.ToInt32(customDay), 0, 0, 0, TimeSpan.Zero);
+        //        if (customDate > DateTime.Today)
+        //        {
+        //            customDays = (customDate - DateTime.Today).Days + 1;
+        //            customText = $"It's {customDays} days until {custom}.";
+        //        }
+        //        else
+        //        {
+        //            customDays = (DateTime.Today - customDate).Days + 1;
+        //            customText = $"It's been {customDays} days since {custom}.";
+        //        }
+        //        Clipboard.SetText(customDays.ToString());
+        //        MessageBox.Show(customText, "Custom Date");
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Invalid date entry", "Error");
+        //    }
+        //}
+
+        private void Custom(object sender, EventArgs e)
         {
             string custom = Interaction.InputBox("Enter a custom Date", "Custom Date", "MM-DD");
             string customText;
             int customDays;
-            string customMonth;
-            string customDay;
-            if (custom.Length > 1)
+            string[] customNew = custom.Select(c => c.ToString()).ToArray();
+            var customMonth = "";
+            var customDay = "";
+            if (Regex.IsMatch(custom, @"[a-zA-Z]"))
+            {
+                MessageBox.Show("Invalid date entry", "Error");
+                return;
+            }
+            if (custom.Length == 2) // no dash single digit month and day
+            {
+                customMonth = custom.Substring(0, 1);
+                customDay = custom.Substring(1, 1);
+            }
+            else if (customNew[1] == "-" && custom.Length == 3) // single digit month and day
+            {
+                customMonth = custom.Substring(0, 1);
+                customDay = custom.Substring(2, 1);
+            }
+            else if (customNew[1] == "-" && custom.Length == 4) // single digit month
+            {
+                customMonth = custom.Substring(0, 1);
+                customDay = custom.Substring(2, 2);
+            }
+            else if (customNew[2] == "-" && custom.Length == 4) // single digit day
+            {
+                customMonth = custom.Substring(0, 2);
+                customDay = custom.Substring(3, 1);
+            }
+            else if (customNew[2] == "-" && custom.Length == 5)
             {
                 customMonth = custom.Substring(0, 2);
                 customDay = custom.Substring(3, 2);
-                DateTimeOffset customDate = new DateTimeOffset(DateTime.Now.Year, Convert.ToInt32(customMonth), Convert.ToInt32(customDay), 0, 0, 0, TimeSpan.Zero);
-                if (customDate > DateTime.Today)
-                {
-                    customDays = (customDate - DateTime.Today).Days + 1;
-                    customText = $"It's {customDays} days until {custom}.";
-                }
-                else
-                {
-                    customDays = (DateTime.Today - customDate).Days + 1;
-                    customText = $"It's been {customDays} days since {custom}.";
-                }
-                Clipboard.SetText(customDays.ToString());
-                MessageBox.Show(customText);
+            }
+            else if (custom.Length == 4) // no dash double digit month and day
+            {
+                customMonth = custom.Substring(0, 2);
+                customDay = custom.Substring(2, 2);
+            }
+            else MessageBox.Show("Invalid date entry", "Error");
+            DateTimeOffset customDate = new DateTimeOffset(DateTime.Now.Year, Convert.ToInt32(customMonth), Convert.ToInt32(customDay), 0, 0, 0, TimeSpan.Zero);
+            if (customDate > DateTime.Today)
+            {
+                customDays = (customDate - DateTime.Today).Days + 1;
+                customText = $"It's {customDays} days until {custom}.";
             }
             else
             {
-                MessageBox.Show("Invalid date entry");
+                customDays = (DateTime.Today - customDate).Days + 1;
+                customText = $"It's been {customDays} days since {custom}.";
             }
+            Clipboard.SetText(customDays.ToString());
+            MessageBox.Show(customText, "Custom Date");
         }
 
-        void Exit(object sender, EventArgs e)
+void Exit(object sender, EventArgs e)
         {
             // Hide tray icon, otherwise it will remain shown until user mouses over it
             notifyIcon1.Visible = false;

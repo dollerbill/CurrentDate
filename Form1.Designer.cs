@@ -42,9 +42,9 @@ namespace dateApp
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.ContextMenu = new System.Windows.Forms.ContextMenu(new System.Windows.Forms.MenuItem[]
             {
-                new MenuItem("Exit", Exit)
+                new MenuItem("Exit", Exit),
+                new MenuItem("Custom", Custom)
             });
-            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon1_MouseDoubleClick);
             this.notifyIcon1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon1_MouseClick);
             // 
             // Form1
