@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using Microsoft.VisualBasic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace dateApp
 {
-public partial class Form1 : Form
+    public partial class Form1 : Form
     {
-        DateTimeOffset newYears = new DateTimeOffset(DateTime.Now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        private DateTimeOffset newYears = new DateTimeOffset(DateTime.Now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
         public Form1()
         {
             InitializeComponent();
@@ -22,7 +18,6 @@ public partial class Form1 : Form
 
         private int getDay()
         {
-            DateTimeOffset newYears = new DateTimeOffset(DateTime.Now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero);
             int today = (DateTime.Today - newYears).Days + 1;
             return today;
         }
@@ -34,21 +29,68 @@ public partial class Form1 : Form
             return prefix;
         }
 
-        private string prefixFinder(int day)
+        public string prefixFinder(int day)
         {
-            if (day == 1)
+            switch (day)
             {
-                return "st";
-            } else if (day == 2)
-            {
-                return "nd";
-            } else if (day == 3)
-            {
-                return "rd";
-            } else
-            {
-                return "th";
+                case 1:
+                    return "st";
+
+                case 2:
+                    return "nd";
+
+                case 3:
+                    return "rd";
+
+                default:
+                    return "th";
             }
+        }
+
+        public string getCustom(string custom)
+        {
+            string[] customNew = custom.Select(c => c.ToString()).ToArray();
+            string customDate = "";
+
+            if (Regex.IsMatch(custom, @"[a-zA-Z]"))
+            {
+                MessageBox.Show("Invalid date entry", "Error");
+                return "";
+            }
+            else if (custom == "") // exiting the popup
+            {
+                return "";
+            }
+            else if (custom.Length == 2) // no dash single digit month and day
+            {
+                customDate = $"0{custom[0]}-0{custom[1]}";
+            }
+            else if (customNew[1] == "-" && custom.Length == 3) // single digit month and day
+            {
+                customDate = $"0{custom[0]}-0{custom[2]}";
+            }
+            else if (custom.Length == 3) // single digit month and two digit day
+            {
+                customDate = $"0{custom[0]}-{custom.Substring(1, 2)}";
+            }
+            else if (customNew[1] == "-" && custom.Length == 4) // single digit month
+            {
+                customDate = $"0{custom}";
+            }
+            else if (customNew[2] == "-" && custom.Length == 4) // single digit day
+            {
+                customDate = $"{custom.Substring(0, 2)}-0{custom[3]}";
+            }
+            else if (customNew[2] == "-" && custom.Length == 5) // double digit month and day
+            {
+                customDate = custom;
+            }
+            else if (custom.Length == 4) // no dash double digit month and day
+            {
+                customDate = $"{custom.Substring(0, 2)}-{custom.Substring(2, 2)}";
+            }
+            else MessageBox.Show("Invalid date entry", "Error");
+            return customDate;
         }
 
         private void NotifyIcon1_MouseClick(object sender, MouseEventArgs e)
@@ -61,110 +103,32 @@ public partial class Form1 : Form
             }
         }
 
-        //private void Custom(object sender, EventArgs e)
-        //{
-        //    string custom = Interaction.InputBox("Enter a custom Date", "Custom Date", "MM-DD");
-        //    string customText;
-        //    int customDays;
-        //    string[] customNew = custom.Select(c => c.ToString()).ToArray();
-        //    string customMonth;
-        //    string customDay;
-        //    if (Regex.IsMatch(custom, @"[a-zA-Z]"))
-        //    {
-        //        MessageBox.Show("Invalid date entry", "Error");
-        //        return;
-        //    }
-        //    if (custom.Length > 1)
-        //    {
-        //        if (customNew[1] == "-" && custom.Length == 4)
-        //        {/* single digit month */ } else if (customNew[2] == "-" && custom.Length == 4)
-        //        {/* single digit day */ }
-        //        customMonth = custom.Substring(0, 2);
-        //        customDay = custom.Substring(3, 2);
-        //        DateTimeOffset customDate = new DateTimeOffset(DateTime.Now.Year, Convert.ToInt32(customMonth), Convert.ToInt32(customDay), 0, 0, 0, TimeSpan.Zero);
-        //        if (customDate > DateTime.Today)
-        //        {
-        //            customDays = (customDate - DateTime.Today).Days + 1;
-        //            customText = $"It's {customDays} days until {custom}.";
-        //        }
-        //        else
-        //        {
-        //            customDays = (DateTime.Today - customDate).Days + 1;
-        //            customText = $"It's been {customDays} days since {custom}.";
-        //        }
-        //        Clipboard.SetText(customDays.ToString());
-        //        MessageBox.Show(customText, "Custom Date");
-        //    }
-        //    else
-        //    {
-        //        MessageBox.Show("Invalid date entry", "Error");
-        //    }
-        //}
-
         private void Custom(object sender, EventArgs e)
         {
             string custom = Interaction.InputBox("Enter a custom Date", "Custom Date", "MM-DD");
             string customText;
             int customDays;
-            string[] customNew = custom.Select(c => c.ToString()).ToArray();
-            var customMonth = "";
-            var customDay = "";
-            if (Regex.IsMatch(custom, @"[a-zA-Z]"))
-            {
-                MessageBox.Show("Invalid date entry", "Error");
-                return;
-            }
-            if (custom.Length == 2) // no dash single digit month and day
-            {
-                customMonth = custom.Substring(0, 1);
-                customDay = custom.Substring(1, 1);
-            }
-            else if (customNew[1] == "-" && custom.Length == 3) // single digit month and day
-            {
-                customMonth = custom.Substring(0, 1);
-                customDay = custom.Substring(2, 1);
-            }
-            else if (customNew[1] == "-" && custom.Length == 4) // single digit month
-            {
-                customMonth = custom.Substring(0, 1);
-                customDay = custom.Substring(2, 2);
-            }
-            else if (customNew[2] == "-" && custom.Length == 4) // single digit day
-            {
-                customMonth = custom.Substring(0, 2);
-                customDay = custom.Substring(3, 1);
-            }
-            else if (customNew[2] == "-" && custom.Length == 5)
-            {
-                customMonth = custom.Substring(0, 2);
-                customDay = custom.Substring(3, 2);
-            }
-            else if (custom.Length == 4) // no dash double digit month and day
-            {
-                customMonth = custom.Substring(0, 2);
-                customDay = custom.Substring(2, 2);
-            }
-            else MessageBox.Show("Invalid date entry", "Error");
-            DateTimeOffset customDate = new DateTimeOffset(DateTime.Now.Year, Convert.ToInt32(customMonth), Convert.ToInt32(customDay), 0, 0, 0, TimeSpan.Zero);
+            var newDate = getCustom(custom);
+
+            DateTimeOffset customDate = new DateTimeOffset(DateTime.Now.Year, Convert.ToInt32(newDate.Substring(0, 2)), Convert.ToInt32(newDate.Substring(3, 2)), 0, 0, 0, TimeSpan.Zero);
             if (customDate > DateTime.Today)
             {
                 customDays = (customDate - DateTime.Today).Days + 1;
-                customText = $"It's {customDays} days until {custom}.";
+                customText = $"It's {customDays} days until {newDate}-{DateTime.Now.Year}.";
             }
             else
             {
                 customDays = (DateTime.Today - customDate).Days + 1;
-                customText = $"It's been {customDays} days since {custom}.";
+                customText = $"It's been {customDays} days since {newDate}-{DateTime.Now.Year}.";
             }
             Clipboard.SetText(customDays.ToString());
             MessageBox.Show(customText, "Custom Date");
         }
 
-void Exit(object sender, EventArgs e)
+        private void Exit(object sender, EventArgs e)
         {
             // Hide tray icon, otherwise it will remain shown until user mouses over it
             notifyIcon1.Visible = false;
-
             Application.Exit();
         }
     }
